@@ -106,3 +106,22 @@ Next Steps
     Swap in API calls once Veloce API credentials are available to replace PDF/TXT parsing.
 
     Add error handling, logging, and automated scheduling (cron, cloud scheduler, etc.).
+
+    ```The automation workflow is now complete and ready for testing:
+
+    Set up a Python environment – create a virtualenv in your project folder and install dependencies with pip install -r requirements.txt.
+
+    Initialize the database – run python init_db.py --db bistro54.db --schema schema.sql.
+
+    Import your client list – run python import_clients.py --db bistro54.db --input "client list bistro54.xlsx".
+
+    Parse transaction PDFs – run python parse_transactions.py DOC080725-001.pdf --csv july_txns.csv --json july_txns.json.
+
+    Load transactions into the DB – run python etl_load.py --db bistro54.db --txns july_txns.csv --period 2025-07.
+
+    (Optional) Reconcile totals – if you have the monthly AR summary, run python reconcile.py --db bistro54.db --monthly monthly_report.csv --period 2025-07.
+
+    Generate invoices – run python generate_invoices.py --db bistro54.db --period 2025-07 --template invoice.pdf --out out/invoices.
+
+    Deliver (or at least log) the invoices – run python deliver_invoices.py --db bistro54.db --period 2025-07 --indir out/invoices.
+    ```
