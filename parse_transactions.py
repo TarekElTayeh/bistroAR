@@ -17,12 +17,13 @@ import argparse
 import csv
 import json
 import re
-from typing import Dict, List
+from pathlib import Path
+from typing import Dict, List, Union
 
 import pdfplumber
 
 
-def parse_transaction_pdf(pdf_path: str) -> List[Dict[str, str]]:
+def parse_transaction_pdf(pdf_path: Union[str, Path]) -> List[Dict[str, str]]:
     """Parse a transaction PDF into a list of records.
 
     Each record is a dictionary containing:
@@ -36,6 +37,7 @@ def parse_transaction_pdf(pdf_path: str) -> List[Dict[str, str]]:
     """
     records: List[Dict[str, str]] = []
     header_info: Dict[str, str] = {}
+    text_found = False
 
     # Header pattern: code, date, time, reference and employee
     header_pattern = re.compile(
@@ -46,11 +48,13 @@ def parse_transaction_pdf(pdf_path: str) -> List[Dict[str, str]]:
         r'(?P<emp>.+)'
     )
 
-    with pdfplumber.open(pdf_path) as pdf:
+    pdf_path = Path(pdf_path)
+    with pdfplumber.open(str(pdf_path)) as pdf:
         for page in pdf.pages:
             text = page.extract_text()
             if not text:
                 continue
+            text_found = True
             for line in text.split('\n'):
                 line = line.strip()
                 # Check if this line is a header
@@ -88,6 +92,10 @@ def parse_transaction_pdf(pdf_path: str) -> List[Dict[str, str]]:
                         'price': price,
                     }
                     records.append(record)
+    if not text_found:
+        raise ValueError(
+            "PDF contains no extractable text; it may be a scanned image without OCR."
+        )
     return records
 
 
@@ -110,6 +118,20 @@ def export_records(records: List[Dict[str, str]], csv_path: str, json_path: str)
     print(f"Exported {len(records)} records to '{csv_path}' and '{json_path}'.")
 
 
+def resolve_pdf_path(path_str: str) -> Path:
+    """Resolve and validate the PDF file path.
+
+    If the provided path lacks a .pdf extension, it is appended automatically.
+    A FileNotFoundError is raised if the resulting path does not exist.
+    """
+    path = Path(path_str)
+    if not path.suffix:
+        path = path.with_suffix(".pdf")
+    if not path.exists():
+        raise FileNotFoundError(f"PDF file not found: {path}")
+    return path
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description='Extract client transactions from a Veloce PDF and export them to CSV and JSON.'
@@ -119,7 +141,12 @@ def main() -> None:
     parser.add_argument('--json', default='transactions.json', help='Path to output JSON file')
     args = parser.parse_args()
 
-    records = parse_transaction_pdf(args.pdf_file)
+    pdf_file = resolve_pdf_path(args.pdf_file)
+    try:
+        records = parse_transaction_pdf(pdf_file)
+    except ValueError as err:
+        print(err)
+        return
     export_records(records, args.csv, args.json)
 
 
