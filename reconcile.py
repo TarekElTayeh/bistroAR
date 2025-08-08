@@ -23,31 +23,62 @@ from typing import Dict
 import pandas as pd
 
 
+def _normalise(columns):
+    return [c.strip().lower().replace(' ', '_') for c in columns]
+
+
 def load_monthly_report(path: str) -> Dict[str, float]:
     ext = Path(path).suffix.lower()
     if ext in {'.xls', '.xlsx'}:
-        df = pd.read_excel(path)
+        raw = pd.read_excel(path, header=None)
     else:
-        df = pd.read_csv(path)
-    # Normalise column names
-    df.columns = [c.strip().lower().replace(' ', '_') for c in df.columns]
-    # Determine code column and balance column heuristically
+        raw = pd.read_csv(path, header=None)
+
+    header_row = 0
+    for idx, row in raw.iterrows():
+        cols = _normalise(row.fillna('').astype(str))
+        if any('code' in c or 'client' in c for c in cols) and any(
+            c.startswith('balance')
+            or c.startswith('owed')
+            or 'amount' in c
+            or c.startswith('total')
+            for c in cols
+        ):
+            header_row = idx
+            break
+
+    if ext in {'.xls', '.xlsx'}:
+        df = pd.read_excel(path, header=header_row)
+    else:
+        df = pd.read_csv(path, header=header_row)
+
+    df.columns = _normalise(df.columns)
+
     code_col = None
     balance_col = None
     for col in df.columns:
-        if col.startswith('code') or col == 'client_code':
+        if code_col is None and ('code' in col or 'client' in col):
             code_col = col
-        if col.startswith('balance') or col.startswith('owed'):
+        if balance_col is None and (
+            col.startswith('balance')
+            or col.startswith('owed')
+            or 'amount' in col
+            or col.startswith('total')
+        ):
             balance_col = col
+
     if code_col is None or balance_col is None:
         raise ValueError('Unable to determine code or balance columns in monthly report')
-    report = {}
+
+    report: Dict[str, float] = {}
     for _, row in df.iterrows():
         code = str(row[code_col]).strip()
+        if not code or code.lower() == 'nan':
+            continue
         try:
-            balance = float(str(row[balance_col]).replace('$', '').replace(',', ''))
+            balance = float(str(row[balance_col]).replace('$', '').replace(',', '').strip())
         except ValueError:
-            balance = 0.0
+            continue
         report[code] = report.get(code, 0.0) + balance
     return report
 
