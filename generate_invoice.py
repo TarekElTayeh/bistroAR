@@ -1,96 +1,141 @@
 #!/usr/bin/env python3
+"""Utilities for rendering invoice PDFs.
+
+This module builds an invoice layout directly with ReportLab so the project
+does not rely on an external PDF template.  The invoice contains a simple
+header, table grid and a summary row.
+
+Example
+-------
+
+```
+from generate_invoice import build_invoice
+
+invoice_data = {
+    "client_name": "Acme Inc.",
+    "period": "July 1st to July 31st 2025",
+    "transactions": [
+        {"date": "2025-07-01", "time": "09:00", "type": "Visit", "reference": "A1", "amount": 10.0},
+    ],
+    "total": 10.0,
+}
+build_invoice("invoice.pdf", invoice_data)
+```
+
+The function above is used by ``generate_invoices.py`` to create one invoice
+per client for a given period.
 """
-generate_invoice.py
 
-Simple script to generate filled invoices from a PDF template.
-It overlays invoice data onto a blank invoice template using
-pypdf (PyPDF2) for reading/writing PDFs and reportlab for
-drawing text.
-
-Usage:
-    python3 generate_invoice.py template.pdf output.pdf --client_name 'Acme Inc.' --period 'July 2025' --date 2025-07-01 --amount 123.45
-
-This script is intentionally kept simple. In the wider automation
-pipeline, generate_invoices.py will call this module repeatedly to
-produce one invoice per client for a given period.
-
-Requirements:
-    - reportlab
-    - pypdf (PyPDF2 also works)
-"""
+from __future__ import annotations
 
 import argparse
-import io
-from datetime import datetime
-from typing import Dict
+from typing import Any, Dict, List
 
-try:
-    from pypdf import PdfReader, PdfWriter  # use pypdf if available
-except ImportError:
-    from PyPDF2 import PdfReader, PdfWriter  # fallback to PyPDF2
-
-from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 
-def fill_invoice(template_path: str, output_path: str, invoice_data: Dict[str, str]) -> None:
-    """Fill the invoice template and write to output_path."""
-    # Create an in-memory PDF for overlay
-    packet = io.BytesIO()
-    can = canvas.Canvas(packet, pagesize=letter)
+def build_invoice(output_path: str, invoice_data: Dict[str, Any]) -> None:
+    """Render ``invoice_data`` into ``output_path`` using ReportLab.
 
-    # Coordinates need to be adjusted to match your template
-    # These values are examples only and may need tweaking
-    can.drawString(70, 720, invoice_data.get('client_name', ''))
-    can.drawString(400, 720, invoice_data.get('period', ''))
+    Parameters
+    ----------
+    output_path:
+        Destination PDF file.
+    invoice_data:
+        Mapping containing ``client_name`` (str), ``period`` (str),
+        ``transactions`` (list of dicts) and ``total`` (float).
+    """
 
-    # Format date for invoice
-    try:
-        date_obj = datetime.strptime(invoice_data['date'], '%Y-%m-%d')
-        date_str = date_obj.strftime('%m/%d/%y')
-    except Exception:
-        date_str = invoice_data.get('date', '')
-    can.drawString(70, 695, date_str)
-    can.drawString(400, 695, f"$ {invoice_data.get('amount', 0):.2f}")
+    can = canvas.Canvas(output_path, pagesize=letter)
+
+    # Header
+    can.setFont("Helvetica-Bold", 14)
+    can.drawString(40, 750, "Client Statement")
+    can.setFont("Helvetica", 12)
+    can.drawString(40, 735, invoice_data.get("client_name", ""))
+    can.drawString(40, 720, invoice_data.get("period", ""))
+
+    # Table grid bounds
+    left, right = 40, 560
+    top, bottom = 680, 150
+    can.rect(left, bottom, right - left, top - bottom)
+
+    # Column lines (date, time, type, reference, amount)
+    columns = [40, 100, 160, 350, 450, 560]
+    for x in columns:
+        can.line(x, top, x, bottom)
+
+    # Horizontal lines for rows (including header row)
+    line_height = 18
+    num_rows = 20
+    for i in range(num_rows + 1):
+        y = top - i * line_height
+        can.line(left, y, right, y)
+
+    # Column headers
+    headers = ["Date", "Time", "Transaction", "Reference", "Amount"]
+    header_y = top - 14
+    for x, text in zip(columns[:-1], headers):
+        can.drawString(x + 2, header_y, text)
+
+    # Transaction rows
+    start_y = top - line_height * 2  # first line after headers
+    transactions = invoice_data.get("transactions", [])[:num_rows - 1]
+    for i, txn in enumerate(transactions):
+        y = start_y - i * line_height
+        can.drawString(columns[0] + 2, y, txn.get("date", ""))
+        can.drawString(columns[1] + 2, y, txn.get("time", ""))
+        can.drawString(columns[2] + 2, y, txn.get("type", ""))
+        can.drawString(columns[3] + 2, y, txn.get("reference", ""))
+        can.drawRightString(columns[5] - 2, y, f"{txn.get('amount', 0):.2f}")
+
+    # Total row just below the table
+    can.setFont("Helvetica-Bold", 12)
+    can.drawString(columns[3] + 2, bottom - 20, "Total $")
+    can.drawRightString(columns[5] - 2, bottom - 20, f"{invoice_data.get('total', 0):.2f}")
 
     can.save()
-    packet.seek(0)
-
-    # Read original template and overlay
-    template_pdf = PdfReader(template_path)
-    overlay_pdf = PdfReader(packet)
-    writer = PdfWriter()
-    page = template_pdf.pages[0]
-    page.merge_page(overlay_pdf.pages[0])
-    writer.add_page(page)
-
-    # Write out the filled invoice
-    with open(output_path, 'wb') as f:
-        writer.write(f)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description='Overlay invoice data onto a PDF template.'
+    parser = argparse.ArgumentParser(description="Generate a single invoice PDF.")
+    parser.add_argument("output", help="Path to write the invoice PDF")
+    parser.add_argument("--client_name", required=True, help="Client name to display")
+    parser.add_argument("--period", required=True, help="Billing period string")
+    parser.add_argument("--total", type=float, required=True, help="Invoice total amount")
+    parser.add_argument(
+        "--transaction",
+        action="append",
+        default=[],
+        help="Transaction as date,time,type,reference,amount; may be repeated",
     )
-    parser.add_argument('template', help='Path to the blank invoice template PDF')
-    parser.add_argument('output', help='Path to write the filled invoice PDF')
-    parser.add_argument('--client_name', required=True, help='Client name to display on invoice')
-    parser.add_argument('--period', required=True, help='Billing period (e.g., "July 2025")')
-    parser.add_argument('--date', required=True, help='Invoice date in YYYY-MM-DD format')
-    parser.add_argument('--amount', type=float, required=True, help='Invoice total amount')
     args = parser.parse_args()
 
+    transactions: List[Dict[str, Any]] = []
+    for t in args.transaction:
+        date, time, ttype, reference, amount = t.split(",")
+        transactions.append(
+            {
+                "date": date,
+                "time": time,
+                "type": ttype,
+                "reference": reference,
+                "amount": float(amount),
+            }
+        )
+
     invoice = {
-        'client_name': args.client_name,
-        'period': args.period,
-        'date': args.date,
-        'amount': args.amount,
+        "client_name": args.client_name,
+        "period": args.period,
+        "transactions": transactions,
+        "total": args.total,
     }
 
-    fill_invoice(args.template, args.output, invoice)
+    build_invoice(args.output, invoice)
     print(f"Generated invoice at {args.output}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
+
