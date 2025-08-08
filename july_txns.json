@@ -1,0 +1,506 @@
+[
+  {
+    "client_code": "94",
+    "date": "2025-07-01",
+    "time": "13:38",
+    "reference": "41771",
+    "employee": "12.Emersan",
+    "description": "69 OPEN FOOD $",
+    "price": 2752.58
+  },
+  {
+    "client_code": "67",
+    "date": "2025-07-02",
+    "time": "13:01",
+    "reference": "41803",
+    "employee": "11.Alex",
+    "description": "1 ASIAN STYLE SALAD",
+    "price": 179.7
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-02",
+    "time": "15:36",
+    "reference": "41831",
+    "employee": "8.Richard",
+    "description": "68 OPEN FOOD $",
+    "price": 2712.69
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-02",
+    "time": "21:19",
+    "reference": "41871",
+    "employee": "2.Emma",
+    "description": "1 SALAD KALE",
+    "price": 141.7
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-03",
+    "time": "14:32",
+    "reference": "2.TVQ",
+    "employee": "2.Emma",
+    "description": "#41926",
+    "price": 32.19
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-03",
+    "time": "15:53",
+    "reference": "2.TVQ",
+    "employee": "2.Emma",
+    "description": "#41917",
+    "price": 2752.58
+  },
+  {
+    "client_code": "81",
+    "date": "2025-07-03",
+    "time": "15:56",
+    "reference": "2.TVQ",
+    "employee": "2.Emma",
+    "description": "#41916",
+    "price": 103.72
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-04",
+    "time": "14:28",
+    "reference": "42097",
+    "employee": "11.Alex",
+    "description": "68 OPEN FOOD $",
+    "price": 2712.69
+  },
+  {
+    "client_code": "67",
+    "date": "2025-07-07",
+    "time": "13:46",
+    "reference": "42332",
+    "employee": "11.Alex",
+    "description": "1 ASIAN STYLE SALAD",
+    "price": 119.51
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-07",
+    "time": "15:01",
+    "reference": "2.TVQ",
+    "employee": "11.Alex",
+    "description": "#42358",
+    "price": 837.74
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-07",
+    "time": "15:06",
+    "reference": "2.TVQ",
+    "employee": "8.Richard",
+    "description": "#42359",
+    "price": 2167.09
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-07",
+    "time": "15:17",
+    "reference": "2.TVQ",
+    "employee": "15.Banquet",
+    "description": "#42360",
+    "price": 3499.25
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-07",
+    "time": "15:22",
+    "reference": "2.TVQ",
+    "employee": "15.Banquet",
+    "description": "#42361",
+    "price": 3549.25
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-07",
+    "time": "15:31",
+    "reference": "2.TVQ",
+    "employee": "11.Alex",
+    "description": "#42363",
+    "price": 4856.59
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-07",
+    "time": "15:34",
+    "reference": "2.TVQ",
+    "employee": "15.Banquet",
+    "description": "#42362",
+    "price": 2348.16
+  },
+  {
+    "client_code": "67",
+    "date": "2025-07-07",
+    "time": "22:25",
+    "reference": "42383",
+    "employee": "2.Emma",
+    "description": "",
+    "price": 500.0
+  },
+  {
+    "client_code": "99",
+    "date": "2025-07-08",
+    "time": "12:59",
+    "reference": "2.TVQ",
+    "employee": "8.Richard",
+    "description": "#42457",
+    "price": 75.0
+  },
+  {
+    "client_code": "52",
+    "date": "2025-07-08",
+    "time": "13:37",
+    "reference": "42463",
+    "employee": "8.Richard",
+    "description": "1 SOUP",
+    "price": 66.64
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-08",
+    "time": "14:51",
+    "reference": "42474",
+    "employee": "15.Banquet",
+    "description": "65 OPEN FOOD $",
+    "price": 2422.55
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-08",
+    "time": "15:03",
+    "reference": "42476",
+    "employee": "15.Banquet",
+    "description": "70 OPEN FOOD $",
+    "price": 4654.13
+  },
+  {
+    "client_code": "54",
+    "date": "2025-07-08",
+    "time": "15:05",
+    "reference": "42473",
+    "employee": "15.Banquet",
+    "description": "2 OPEN FOOD $",
+    "price": 327.44
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-08",
+    "time": "19:12",
+    "reference": "2.TVQ",
+    "employee": "11.Alex",
+    "description": "#42603",
+    "price": 4394.18
+  },
+  {
+    "client_code": "99",
+    "date": "2025-07-08",
+    "time": "19:15",
+    "reference": "42593",
+    "employee": "5.Take Out",
+    "description": "",
+    "price": 116.58
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-09",
+    "time": "11:42",
+    "reference": "42683",
+    "employee": "9.Stefano",
+    "description": "",
+    "price": 732.36
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-09",
+    "time": "12:07",
+    "reference": "42691",
+    "employee": "8.Richard",
+    "description": "",
+    "price": 699.62
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-09",
+    "time": "15:01",
+    "reference": "42716",
+    "employee": "9.Stefano",
+    "description": "70 OPEN FOOD $",
+    "price": 4654.13
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-09",
+    "time": "15:02",
+    "reference": "42715",
+    "employee": "11.Alex",
+    "description": "66 OPEN FOOD $",
+    "price": 2457.74
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-09",
+    "time": "15:03",
+    "reference": "2.TVQ",
+    "employee": "15.Banquet",
+    "description": "#42721",
+    "price": 3886.69
+  },
+  {
+    "client_code": "67",
+    "date": "2025-07-09",
+    "time": "19:01",
+    "reference": "2.TVQ",
+    "employee": "2.Emma",
+    "description": "#42698",
+    "price": 724.87
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-10",
+    "time": "11:25",
+    "reference": "42827",
+    "employee": "2.Emma",
+    "description": "",
+    "price": 4336.69
+  },
+  {
+    "client_code": "96",
+    "date": "2025-07-10",
+    "time": "11:26",
+    "reference": "42826",
+    "employee": "8.Richard",
+    "description": "",
+    "price": 2382.35
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-10",
+    "time": "11:29",
+    "reference": "42828",
+    "employee": "2.Emma",
+    "description": "",
+    "price": 562.9
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-11",
+    "time": "13:02",
+    "reference": "42976",
+    "employee": "9.Stefano",
+    "description": "",
+    "price": 614.34
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-11",
+    "time": "17:48",
+    "reference": "43014",
+    "employee": "11.Alex",
+    "description": "11 OPEN FOOD $",
+    "price": 438.82
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-12",
+    "time": "11:15",
+    "reference": "43064",
+    "employee": "2.Emma",
+    "description": "12 OPEN FOOD $",
+    "price": 478.71
+  },
+  {
+    "client_code": "52",
+    "date": "2025-07-14",
+    "time": "14:01",
+    "reference": "2.TVQ",
+    "employee": "11.Alex",
+    "description": "#43131",
+    "price": 55.29
+  },
+  {
+    "client_code": "67",
+    "date": "2025-07-14",
+    "time": "22:31",
+    "reference": "2.TVQ",
+    "employee": "9.Stefano",
+    "description": "#43220",
+    "price": 385.14
+  },
+  {
+    "client_code": "67",
+    "date": "2025-07-15",
+    "time": "14:03",
+    "reference": "2.TVQ",
+    "employee": "2.Emma",
+    "description": "#43278",
+    "price": 85.94
+  },
+  {
+    "client_code": "19",
+    "date": "2025-07-16",
+    "time": "14:16",
+    "reference": "43451",
+    "employee": "9.Stefano",
+    "description": "",
+    "price": 103.53
+  },
+  {
+    "client_code": "21",
+    "date": "2025-07-16",
+    "time": "14:33",
+    "reference": "43477",
+    "employee": "5.Take Out",
+    "description": "",
+    "price": 0.0
+  },
+  {
+    "client_code": "7",
+    "date": "2025-07-16",
+    "time": "19:02",
+    "reference": "43506",
+    "employee": "4.Makayla",
+    "description": "2 LATTE",
+    "price": 23.51
+  },
+  {
+    "client_code": "52",
+    "date": "2025-07-17",
+    "time": "13:57",
+    "reference": "2.TVQ",
+    "employee": "9.Stefano",
+    "description": "#43588",
+    "price": 115.53
+  },
+  {
+    "client_code": "94",
+    "date": "2025-07-17",
+    "time": "14:37",
+    "reference": "2.TVQ",
+    "employee": "9.Stefano",
+    "description": "#43564",
+    "price": 110.37
+  },
+  {
+    "client_code": "7",
+    "date": "2025-07-17",
+    "time": "18:49",
+    "reference": "2.TVQ",
+    "employee": "11.Alex",
+    "description": "#43622",
+    "price": 100.0
+  },
+  {
+    "client_code": "90",
+    "date": "2025-07-21",
+    "time": "12:11",
+    "reference": "2.TVQ",
+    "employee": "5.Take Out",
+    "description": "#43962",
+    "price": 19.32
+  },
+  {
+    "client_code": "18",
+    "date": "2025-07-22",
+    "time": "13:41",
+    "reference": "2.TVQ",
+    "employee": "2.Emma",
+    "description": "#44074",
+    "price": 82.43
+  },
+  {
+    "client_code": "99",
+    "date": "2025-07-23",
+    "time": "13:05",
+    "reference": "44327",
+    "employee": "11.Alex",
+    "description": "",
+    "price": 108.7
+  },
+  {
+    "client_code": "90",
+    "date": "2025-07-23",
+    "time": "18:31",
+    "reference": "2.TVQ",
+    "employee": "2.Emma",
+    "description": "#44360",
+    "price": 121.71
+  },
+  {
+    "client_code": "21",
+    "date": "2025-07-24",
+    "time": "17:40",
+    "reference": "2.TVQ",
+    "employee": "9.Stefano",
+    "description": "#44483",
+    "price": 588.42
+  },
+  {
+    "client_code": "7",
+    "date": "2025-07-24",
+    "time": "23:15",
+    "reference": "2.TVQ",
+    "employee": "4.Makayla",
+    "description": "#44543",
+    "price": 100.0
+  },
+  {
+    "client_code": "90",
+    "date": "2025-07-25",
+    "time": "16:27",
+    "reference": "44621",
+    "employee": "2.Emma",
+    "description": "",
+    "price": 35.9
+  },
+  {
+    "client_code": "39",
+    "date": "2025-07-28",
+    "time": "10:52",
+    "reference": "44722",
+    "employee": "15.Banquet",
+    "description": "",
+    "price": 332.44
+  },
+  {
+    "client_code": "78",
+    "date": "2025-07-28",
+    "time": "10:56",
+    "reference": "44723",
+    "employee": "15.Banquet",
+    "description": "4 OPEN FOOD $",
+    "price": 653.38
+  },
+  {
+    "client_code": "67",
+    "date": "2025-07-30",
+    "time": "21:10",
+    "reference": "2.TVQ",
+    "employee": "4.Makayla",
+    "description": "#45174",
+    "price": 39.89
+  },
+  {
+    "client_code": "67",
+    "date": "2025-07-31",
+    "time": "9:59",
+    "reference": "2.TVQ",
+    "employee": "15.Banquet",
+    "description": "#45286",
+    "price": 789.85
+  },
+  {
+    "client_code": "18",
+    "date": "2025-07-31",
+    "time": "14:04",
+    "reference": "2.TVQ",
+    "employee": "2.Emma",
+    "description": "#45312",
+    "price": 183.16
+  }
+]
