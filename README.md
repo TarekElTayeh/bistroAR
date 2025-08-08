@@ -49,7 +49,7 @@ This project provides scripts to:
 ├── README.md
 ├── txt_journal_parser.py # Parses TXT dumps to CSV/JSON/Excel
 ├── parse_transactions.py # Extracts detailed transactions from PDF
-├── generateInvoice.py # Fills PDF invoice template with data
+├── generate_invoice.py # Fills PDF invoice template with data
 ├── cleanup_outputs.py # Deletes generated CSV/JSON/Excel/PDF files
 ├── invoice.pdf # Blank invoice template
 └── venv/ # Python virtual environment
@@ -82,13 +82,13 @@ python3 txt_journal_parser.py path/to/journal.txt \
 
 3. Generate Invoices
 
-python3 generateInvoice.py invoice.pdf filled_invoice.pdf
+python3 generate_invoice.py invoice.pdf filled_invoice.pdf
 
     invoice.pdf: Path to your blank template.
 
     filled_invoice.pdf: Destination for the populated invoice.
 
-Customize generateInvoice.py to loop over parsed data and produce one PDF per customer or per day.
+Customize generate_invoice.py to loop over parsed data and produce one PDF per customer or per day.
 4. Cleanup Outputs
 
 python3 cleanup_outputs.py --csv ar.csv --json ar.json --excel ar.xlsx

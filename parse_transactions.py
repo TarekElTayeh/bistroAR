@@ -43,7 +43,7 @@ def parse_transaction_pdf(pdf_path: str) -> List[Dict[str, str]]:
         r'(?P<date>\d{1,2}/\d{1,2}/\d{2})\s+'
         r'(?P<time>\d{1,2}:\d{2})\s+'
         r'#?(?P<ref>\d+)\s+'
-        r'(?P<emp>\S+)'
+        r'(?P<emp>.+)'
     )
 
     with pdfplumber.open(pdf_path) as pdf:
@@ -63,7 +63,7 @@ def parse_transaction_pdf(pdf_path: str) -> List[Dict[str, str]]:
                     info['date'] = f"{yyyy}-{int(mm):02d}-{int(dd):02d}"
                     info['client_code'] = info.pop('code')
                     info['reference'] = info.pop('ref')
-                    info['employee'] = info.pop('emp')
+                    info['employee'] = info.pop('emp').strip()
                     header_info = info
                 else:
                     # Attempt to parse item line: description + price at end
