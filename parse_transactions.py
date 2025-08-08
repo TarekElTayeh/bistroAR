@@ -17,13 +17,18 @@ import argparse
 import csv
 import json
 import re
-from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List
 
 import pdfplumber
 
+try:
+    # Optional import for Excel parsing; will be used if an Excel file is passed.
+    from parse_transactions_excel import parse_excel  # type: ignore
+except Exception:
+    parse_excel = None  # type: ignore
 
-def parse_transaction_pdf(pdf_path: Union[str, Path]) -> List[Dict[str, str]]:
+
+def parse_transaction_pdf(pdf_path: str) -> List[Dict[str, str]]:
     """Parse a transaction PDF into a list of records.
 
     Each record is a dictionary containing:
@@ -44,11 +49,10 @@ def parse_transaction_pdf(pdf_path: Union[str, Path]) -> List[Dict[str, str]]:
         r'(?P<date>\d{1,2}/\d{1,2}/\d{2})\s+'
         r'(?P<time>\d{1,2}:\d{2})\s+'
         r'#?(?P<ref>\d+)\s+'
-        r'(?P<emp>.+)'
+        r'(?P<emp>\S+)'
     )
 
-    pdf_path = Path(pdf_path)
-    with pdfplumber.open(str(pdf_path)) as pdf:
+    with pdfplumber.open(pdf_path) as pdf:
         for page in pdf.pages:
             text = page.extract_text()
             if not text:
@@ -65,7 +69,7 @@ def parse_transaction_pdf(pdf_path: Union[str, Path]) -> List[Dict[str, str]]:
                     info['date'] = f"{yyyy}-{int(mm):02d}-{int(dd):02d}"
                     info['client_code'] = info.pop('code')
                     info['reference'] = info.pop('ref')
-                    info['employee'] = info.pop('emp').strip()
+                    info['employee'] = info.pop('emp')
                     header_info = info
                 else:
                     # Attempt to parse item line: description + price at end
@@ -112,31 +116,28 @@ def export_records(records: List[Dict[str, str]], csv_path: str, json_path: str)
     print(f"Exported {len(records)} records to '{csv_path}' and '{json_path}'.")
 
 
-def resolve_pdf_path(path_str: str) -> Path:
-    """Resolve and validate the PDF file path.
-
-    If the provided path lacks a .pdf extension, it is appended automatically.
-    A FileNotFoundError is raised if the resulting path does not exist.
-    """
-    path = Path(path_str)
-    if not path.suffix:
-        path = path.with_suffix(".pdf")
-    if not path.exists():
-        raise FileNotFoundError(f"PDF file not found: {path}")
-    return path
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description='Extract client transactions from a Veloce PDF and export them to CSV and JSON.'
+        description='Extract client transactions from a Veloce PDF or Excel file and export them to CSV and JSON.'
     )
-    parser.add_argument('pdf_file', help='Path to the input PDF file')
+    parser.add_argument('file', help='Path to the input PDF or Excel file')
     parser.add_argument('--csv', default='transactions.csv', help='Path to output CSV file')
     parser.add_argument('--json', default='transactions.json', help='Path to output JSON file')
     args = parser.parse_args()
 
-    pdf_file = resolve_pdf_path(args.pdf_file)
-    records = parse_transaction_pdf(pdf_file)
+    # Delegate to Excel parser if the extension indicates an Excel file
+    file_lower = args.file.lower()
+    if file_lower.endswith(('.xls', '.xlsx')):
+        if parse_excel is None:
+            raise ImportError(
+                'Excel parsing is not available. Ensure parse_transactions_excel.py exists and pandas is installed.'
+            )
+        records = parse_excel(args.file)
+        export_records(records, args.csv, args.json)
+        return
+
+    # Otherwise parse as PDF
+    records = parse_transaction_pdf(args.file)
     export_records(records, args.csv, args.json)
 
 
