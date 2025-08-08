@@ -9,7 +9,7 @@ Usage:
     python3 import_clients.py --db path/to/database.db --input client_list.xlsx
 
 The input file should contain at least the following columns:
-    Code, Name, Phone, Adress(1), Adress(2), Prepaid balance,
+    Code, Name, Phone, Address(1), Address(2), Prepaid balance,
     Owed amount, E-Mail (optional)
 
 CSV files are supported as well. Column names are case‑insensitive.
@@ -38,7 +38,7 @@ def import_clients(db_path: str, input_path: str) -> None:
     # Normalise column names
     df.columns = normalise_column_names(df.columns)
     # Expected columns
-    # code, name, phone, adress1, adress2, prepaid_balance,
+    # code, name, phone, address1, address2, prepaid_balance,
     # owed_amount, e_mail
     # Some spreadsheets may name address columns differently
     mapping: Dict[str, str] = {
