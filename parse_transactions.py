@@ -91,11 +91,20 @@ def export_data(records, csv_path, json_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Extract transaction details from a PDF and export to CSV/JSON")
-    
-    parser.add_argument("pdf file", help="Path to the transaction PDF")
-    parser.add_argument("--csv", default="transactions.csv", help="output CSV file parth")
-    parser.add_argument("--json", default="transactions.json", help="Output JSON file path")
+        description="Extract transaction details from a PDF and export to CSV/JSON",
+    )
+
+    parser.add_argument("pdf_file", help="Path to the transaction PDF")
+    parser.add_argument(
+        "--csv",
+        default="transactions.csv",
+        help="Output CSV file path",
+    )
+    parser.add_argument(
+        "--json",
+        default="transactions.json",
+        help="Output JSON file path",
+    )
     args = parser.parse_args()
 
     records = parse_transaction_pdf(args.pdf_file)

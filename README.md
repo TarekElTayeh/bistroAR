@@ -49,8 +49,9 @@ This project provides scripts to:
 ├── README.md
 ├── txt_journal_parser.py # Parses TXT dumps to CSV/JSON/Excel
 ├── parse_transactions.py # Extracts detailed transactions from PDF
-├── generateInvoice.py # Fills PDF invoice template with data
-├── cleanup_outputs.py # Deletes generated CSV/JSON/Excel/PDF files
+├── generateInvoice.py      # Fills a single PDF invoice template with data
+├── generate_invoices.py    # Batch-generate invoices from transaction JSON
+├── cleanup_outputs.py      # Deletes generated CSV/JSON/Excel/PDF files
 ├── invoice.pdf # Blank invoice template
 └── venv/ # Python virtual environment
 
@@ -69,40 +70,51 @@ python3 parse_transactions.py path/to/DOC080725-001.pdf \
 
 This produces one row per item with columns:
 client_code, date (YYYY-MM-DD), time (HH:MM), reference, employee, description, price.
-2. Parse Journal Entries (TXT)
+### 2. Parse Journal Entries (TXT)
 
+```bash
 python3 txt_journal_parser.py path/to/journal.txt \
   --csv ar.csv --json ar.json --excel ar.xlsx
+```
 
-    --csv: Path to output CSV file (default: output.csv).
+* `--csv`: Path to output CSV file (default: output.csv).
+* `--json`: Path to output JSON file (default: output.json).
+* `--excel`: Path to output Excel file (default: output.xlsx).
 
-    --json: Path to output JSON file (default: output.json).
+### 3. Generate a Single Invoice
 
-    --excel: Path to output Excel file (default: output.xlsx).
-
-3. Generate Invoices
-
+```bash
 python3 generateInvoice.py invoice.pdf filled_invoice.pdf
+```
 
-    invoice.pdf: Path to your blank template.
+* `invoice.pdf`: Path to your blank template.
+* `filled_invoice.pdf`: Destination for the populated invoice.
 
-    filled_invoice.pdf: Destination for the populated invoice.
+### 4. Generate Invoices for Each Client
 
-Customize generateInvoice.py to loop over parsed data and produce one PDF per customer or per day.
-4. Cleanup Outputs
+```bash
+python3 generate_invoices.py transactions.json invoice.pdf \
+  --db database/bistro54_clients.db --out-dir invoices
+```
 
+Reads `transactions.json`, groups records by `client_code`, looks up client names from the SQLite database, and writes one `filled_invoice_<code>.pdf` per client in the `invoices/` directory.
+
+### 5. Cleanup Outputs
+
+```bash
 python3 cleanup_outputs.py --csv ar.csv --json ar.json --excel ar.xlsx
+```
 
 Removes specified output files if they exist.
-5. Makefile Targets
 
+### 6. Makefile Targets
+
+```
 make           # Show help
 make clean     # Remove all *.csv, *.json, *.xlsx, *.pdf outputs
+```
 
-Next Steps
+## Next Steps
 
-    Group extracted transactions by client_code and pass to the invoice generator so each customer’s visits appear as separate line-items.
-
-    Swap in API calls once Veloce API credentials are available to replace PDF/TXT parsing.
-
-    Add error handling, logging, and automated scheduling (cron, cloud scheduler, etc.).
+* Replace PDF/TXT parsing with Veloce API calls when credentials are available.
+* Add error handling, logging, and automated scheduling (cron, cloud scheduler, etc.).
