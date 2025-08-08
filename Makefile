@@ -11,7 +11,6 @@ TEMPLATE ?=invoice.pdf
 OUTPUT ?=filled_invoice.pdf
 DB ?=database/bistro54_clients.db
 OUTDIR ?=.
-
 .PHONY: help parse-pdf parse-txt invoices batch-invoices clean
 
 help:
@@ -30,10 +29,8 @@ parse-txt:
 
 invoices:
 > $(PYTHON) generateInvoice.py $(TEMPLATE) $(OUTPUT)
-
 batch-invoices:
 > $(PYTHON) generate_invoices.py $(JSON) $(TEMPLATE) --db $(DB) --out-dir $(OUTDIR)
-
 clean:
 > $(PYTHON) cleanup_outputs.py --csv $(wildcard *.csv) \
 >     --json $(wildcard *.json) --excel $(wildcard *.xlsx) \
