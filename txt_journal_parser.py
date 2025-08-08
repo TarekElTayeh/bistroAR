@@ -1,145 +1,113 @@
 #!/usr/bin/env python3
 """
-Tiny parser for multi-day Veloce journal entry TXT files with Excel export.
+txt_journal_parser.py
+
+Parse a text file containing daily journal entries exported from Veloce/Velbo
+and extract the individual transactions for account 1105. The input file
+may contain multiple days worth of data. For each transaction line on
+account 1105, the script emits a record with the date (YYYY-MM-DD) and
+the amount.
 
 Usage:
-    python3 txt_journal_parser.py path/to/journal.txt \
-        --csv ar.csv --json ar.json --excel ar.xlsx
+    python3 txt_journal_parser.py journal.txt --csv ar.csv --json ar.json --excel ar.xlsx
 
-This script:
-  1. Reads each line of the TXT file.
-  2. Detects lines starting with a date in MM-DD-YY format and sets current_date.
-  3. For lines where the account column is "1105", records an entry with date and amount.
-  4. Outputs all entries as CSV, JSON, and Excel.
+If --csv/--json/--excel are not provided, defaults to output.csv/output.json/output.xlsx.
+
+Requirements:
+    - pandas (for Excel export)
 """
+
+import argparse
 import csv
 import json
-import argparse
-import sys
+import re
 from datetime import datetime
+from pathlib import Path
+from typing import List, Dict
 
-# Optional: pandas for Excel export
 try:
-    import pandas as pd
+    import pandas as pd  # type: ignore
 except ImportError:
-    pd = None
+    pd = None  # type: ignore
 
 
-def parse_journal_entries(txt_path):
-    """
-    Parse a multi-day journal entry TXT file to extract all account 1105 transactions.
+DATE_PATTERN = re.compile(r'^(\d{2})-(\d{2})-(\d{2})')
+ENTRY_PATTERN = re.compile(r'^(\d+),\s*([-+]?[0-9]*\.?[0-9]+)')
 
-    Args:
-        txt_path (str): Path to the journal entry TXT file.
 
-    Returns:
-        list of dict: Each dict has 'date', 'account', and 'amount'.
-    """
-    entries = []
-    current_date = None
-    try:
-        with open(txt_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if not line:
+def parse_journal_file(txt_path: str) -> List[Dict[str, str]]:
+    records: List[Dict[str, str]] = []
+    current_date_iso = None
+    with open(txt_path, encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            # Check for date line
+            date_match = DATE_PATTERN.match(line)
+            if date_match:
+                mm, dd, yy = date_match.groups()
+                yyyy = '20' + yy
+                try:
+                    date_obj = datetime.strptime(f"{yyyy}-{mm}-{dd}", '%Y-%m-%d')
+                    current_date_iso = date_obj.strftime('%Y-%m-%d')
+                except Exception:
+                    current_date_iso = None
+                continue
+            # Check for account entry line
+            entry_match = ENTRY_PATTERN.match(line)
+            if entry_match and current_date_iso:
+                account = entry_match.group(1)
+                amount_str = entry_match.group(2)
+                try:
+                    amount = float(amount_str)
+                except ValueError:
                     continue
-                parts = [p.strip() for p in line.split(',')]
-                # Check for date header (MM-DD-YY)
-                if len(parts) >= 1:
-                    try:
-                        dt = datetime.strptime(parts[0], '%m-%d-%y')
-                        current_date = dt.strftime('%Y-%m-%d')
-                        continue
-                    except ValueError:
-                        pass
-                # If we have a current_date, look for account 1105 lines
-                if current_date and len(parts) >= 2 and parts[0] == '1105':
-                    try:
-                        amt = float(parts[1].replace(',', ''))
-                    except ValueError:
-                        print(f"Warning: invalid amount '{parts[1]}' on date {current_date}")
-                        continue
-                    entries.append({
-                        'date': current_date,
-                        'account': '1105',
-                        'amount': amt
+                # Only process account 1105
+                if account == '1105':
+                    records.append({
+                        'date': current_date_iso,
+                        'account': account,
+                        'amount': amount,
                     })
-    except FileNotFoundError:
-        raise ValueError(f"File not found: {txt_path}")
-    except Exception as e:
-        raise ValueError(f"Failed to read {txt_path}: {e}")
-
-    if not entries:
-        raise ValueError(f"No transactions for account 1105 found in {txt_path}")
-    return entries
+    return records
 
 
-def main():
+def export_records(records: List[Dict[str, str]], csv_path: str, json_path: str, excel_path: str) -> None:
+    if not records:
+        print("No transactions found for account 1105.")
+        return
+    # CSV
+    with open(csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=list(records[0].keys()))
+        writer.writeheader()
+        writer.writerows(records)
+    # JSON
+    with open(json_path, 'w', encoding='utf-8') as jsonfile:
+        json.dump(records, jsonfile, indent=2)
+    # Excel (optional)
+    if excel_path:
+        if pd is None:
+            print("pandas is not installed; skipping Excel export.")
+        else:
+            df = pd.DataFrame(records)
+            df.to_excel(excel_path, index=False)
+    print(f"Exported {len(records)} records to {csv_path}, {json_path} and {excel_path if excel_path else 'N/A'}")
+
+
+def main() -> None:
     parser = argparse.ArgumentParser(
-        description='Parse a Veloce multi-day journal entry TXT and export CSV/JSON/Excel'
+        description='Parse a Veloce journal TXT file and extract account 1105 transactions.'
     )
-    parser.add_argument(
-        'txt_file',
-        help='Path to the journal entry TXT file (e.g., test.txt)'
-    )
-    parser.add_argument(
-        '--csv',
-        default='output.csv',
-        help='Output CSV file path'
-    )
-    parser.add_argument(
-        '--json',
-        default='output.json',
-        help='Output JSON file path'
-    )
-    parser.add_argument(
-        '--excel',
-        default='output.xlsx',
-        help='Output Excel file path (.xlsx)'
-    )
-
+    parser.add_argument('txt_file', help='Path to the journal text file')
+    parser.add_argument('--csv', default='output.csv', help='Path to output CSV')
+    parser.add_argument('--json', default='output.json', help='Path to output JSON')
+    parser.add_argument('--excel', default='output.xlsx', help='Path to output Excel (requires pandas)')
     args = parser.parse_args()
 
-    try:
-        records = parse_journal_entries(args.txt_file)
-    except ValueError as e:
-        print(f"Error: {e}")
-        sys.exit(1)
+    records = parse_journal_file(args.txt_file)
+    export_records(records, args.csv, args.json, args.excel)
 
-    # Write CSV
-    try:
-        with open(args.csv, 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=['date', 'account', 'amount'])
-            writer.writeheader()
-            for r in records:
-                writer.writerow(r)
-    except Exception as e:
-        print(f"Failed to write CSV: {e}")
-        sys.exit(1)
-
-    # Write JSON
-    try:
-        with open(args.json, 'w', encoding='utf-8') as jsonfile:
-            json.dump(records, jsonfile, indent=2)
-    except Exception as e:
-        print(f"Failed to write JSON: {e}")
-        sys.exit(1)
-
-    # Write Excel if pandas is available
-    if pd:
-        try:
-            df = pd.DataFrame(records)
-            df.to_excel(args.excel, index=False)
-        except Exception as e:
-            print(f"Failed to write Excel: {e}")
-            sys.exit(1)
-    else:
-        print("Pandas not installed; skipping Excel export. Install pandas to enable this feature.")
-
-    # Print transactions to console
-    print(f"Parsed {len(records)} transactions for account 1105:")
-    for rec in records:
-        print(f"{rec['date']}, Account {rec['account']}, Amount {rec['amount']}")
 
 if __name__ == '__main__':
     main()
