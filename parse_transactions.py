@@ -141,12 +141,18 @@ def main() -> None:
     parser.add_argument('--json', default='transactions.json', help='Path to output JSON file')
     args = parser.parse_args()
 
-    pdf_file = resolve_pdf_path(args.pdf_file)
+    try:
+        pdf_file = resolve_pdf_path(args.pdf_file)
+    except FileNotFoundError as err:
+        print(err)
+        return
+
     try:
         records = parse_transaction_pdf(pdf_file)
     except ValueError as err:
         print(err)
         return
+
     export_records(records, args.csv, args.json)
 
 
